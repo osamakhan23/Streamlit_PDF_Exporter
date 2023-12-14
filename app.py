@@ -9,20 +9,27 @@ def highlight_text(page_text, search_query):
     return highlighted
 
 st.title("PDF Extractor App")
+st.markdown("Upload a PDF file and extract text from it. You can choose to extract from a specific page or the entire document.")
 
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
-search_query = st.text_input("Enter text to search in the PDF")
+# File uploader in a column
+col1, col2 = st.columns(2)
+with col1:
+    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+
+with col2:
+    search_query = st.text_input("Enter text to search in the PDF")
 
 if uploaded_file is not None:
     pdf_reader = PdfReader(io.BytesIO(uploaded_file.read()))
 
-    # Extract All Text from the PDF
-    if st.checkbox("Extract text from all pages"):
+    with st.expander("Advanced Options"):
+        all_pages = st.checkbox("Extract text from all pages")
+
+    if all_pages:
         all_text = ""
         for page in pdf_reader.pages:
             all_text += page.extract_text() + "\n"
-        st.text_area("All Text", all_text, height=300)
-
+        st.text_area("Extracted Text", all_text, height=300)
     else:
         page_number = st.number_input("Page number", 1, len(pdf_reader.pages), format='%i') - 1
         page = pdf_reader.pages[page_number]
